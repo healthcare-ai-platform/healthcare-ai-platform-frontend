@@ -1,0 +1,67 @@
+.page { display: flex; flex-direction: column; flex: 1; }
+
+.content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.queueRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--color-border);
+  gap: 8px;
+}
+.queueRow:last-child { border-bottom: none; }
+
+.queueInfo { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.queueId { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono); flex-shrink: 0; }
+.queueName { font-size: 12px; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.queueType { font-size: 11px; color: var(--color-text-muted); flex-shrink: 0; }
+
+.stageRow { margin-bottom: 10px; }
+.stageRow:last-child { margin-bottom: 0; }
+.stageMeta { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.stageDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stageName { font-size: 12px; color: var(--color-text-secondary); flex: 1; }
+.stageCount { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.progressBg { height: 4px; background: var(--color-bg-tertiary); border-radius: 100px; }
+.progressFill { height: 4px; border-radius: 100px; transition: width 0.6s ease; }
+
+.alertRow { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border); }
+.alertRow:last-child { border-bottom: none; }
+.alertBody { flex: 1; min-width: 0; }
+.alertTitle { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.alertDetail { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.alertTime { font-size: 10px; color: var(--color-text-muted); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+.tenantGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+.tenantCard {
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.875rem;
+}
+.tenantTop { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tenantAvatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.tenantName { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.tenantDocs { font-size: 11px; color: var(--color-text-muted); }
+.tenantStats { display: flex; gap: 16px; padding-top: 8px; border-top: 0.5px solid var(--color-border); }
+.statLabel { font-size: 10px; color: var(--color-text-muted); display: block; }
+.statVal { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }

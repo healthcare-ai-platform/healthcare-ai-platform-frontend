@@ -1,0 +1,22 @@
+export function clsx(...args) {
+  return args.filter(Boolean).join(' ');
+}
+
+export function formatNumber(n) {
+  return new Intl.NumberFormat().format(n);
+}
+
+export const statusConfig = {
+  loaded:     { label: 'Loaded',     bg: '#eaf3de', color: '#3b6d11' },
+  extracting: { label: 'Extracting', bg: '#e6f1fb', color: '#185fa5' },
+  ocr:        { label: 'OCR',        bg: '#eeedfe', color: '#534ab7' },
+  failed:     { label: 'Failed',     bg: '#fcebeb', color: '#a32d2d' },
+  queued:     { label: 'Queued',     bg: '#f1f3f7', color: '#4b5669' },
+  processing: { label: 'Processing', bg: '#faeeda', color: '#854f0b' },
+};
+
+export const patientStatusConfig = {
+  normal:   { label: 'Normal',   bg: '#eaf3de', color: '#3b6d11' },
+  abnormal: { label: 'Abnormal', bg: '#fcebeb', color: '#a32d2d' },
+  review:   { label: 'Review',   bg: '#faeeda', color: '#854f0b' },
+};

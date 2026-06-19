@@ -1,0 +1,31 @@
+.card {
+  background: var(--color-bg-primary);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.125rem 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  display: block;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.action {
+  flex-shrink: 0;
+}

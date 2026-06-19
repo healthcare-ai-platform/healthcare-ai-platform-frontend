@@ -1,0 +1,144 @@
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--color-bg-primary);
+  border-right: 0.5px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1.125rem 1rem;
+  border-bottom: 0.5px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.brandIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: var(--color-blue-500);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.brandSub {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
+.nav {
+  flex: 1;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.75rem 1rem 0.25rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 1rem;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: background var(--transition), color var(--transition);
+  position: relative;
+}
+
+.navItem:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.navItem.active {
+  background: var(--color-blue-50);
+  color: var(--color-blue-500);
+  font-weight: 500;
+}
+
+.navIcon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+}
+
+.navBadge {
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--color-red-50);
+  color: var(--color-red-500);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.875rem 1rem;
+  border-top: 0.5px solid var(--color-border);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.userRow:hover { background: var(--color-bg-secondary); }
+.userRowActive { background: var(--color-blue-50); }
+.userRowActive .userName { color: var(--color-blue-500); }
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-blue-50);
+  color: var(--color-blue-500);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.userRole {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}

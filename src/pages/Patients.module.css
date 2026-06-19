@@ -1,0 +1,59 @@
+.page { display: flex; flex-direction: column; flex: 1; }
+.content { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search {
+  flex: 1;
+  max-width: 320px;
+  height: 34px;
+  border: 0.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  outline: none;
+}
+.search:focus { border-color: var(--color-blue-500); }
+
+.filterGroup { display: flex; gap: 4px; }
+
+.filterBtn {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+  transition: all var(--transition);
+}
+.filterBtn:hover { background: var(--color-bg-secondary); }
+.filterBtn.active { background: var(--color-blue-50); color: var(--color-blue-500); border-color: var(--color-blue-100); font-weight: 500; }
+
+.count { font-size: 12px; color: var(--color-text-muted); margin-left: auto; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  padding: 0 12px 10px 0;
+  border-bottom: 0.5px solid var(--color-border);
+  white-space: nowrap;
+}
+.table td { padding: 10px 12px 10px 0; border-bottom: 0.5px solid var(--color-border); vertical-align: middle; }
+.tableRow:last-child td { border-bottom: none; }
+.tableRow:hover td { background: var(--color-bg-secondary); }
+
+.patientId { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); }
+.patientName { font-weight: 500; color: var(--color-text-primary); }
+.muted { color: var(--color-text-secondary); }
+.reportCount { font-weight: 500; color: var(--color-text-primary); }
+.empty { text-align: center; padding: 2rem; color: var(--color-text-muted); font-size: 13px; }
