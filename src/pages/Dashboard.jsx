@@ -3,9 +3,8 @@ import MetricCard from '../components/ui/MetricCard';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import ThroughputChart from '../components/charts/ThroughputChart';
-import { kpiData, pipelineQueue, pipelineStages, alerts, tenants } from '../data/mockData';
 import { statusConfig } from '../utils/helpers';
-import { useLiveMetric } from '../hooks/useLive';
+import { useFetch } from '../hooks/useApi';
 import styles from './Dashboard.module.css';
 
 function AlertIcon({ type }) {
@@ -25,30 +24,57 @@ function AlertIcon({ type }) {
   );
 }
 
+function Skeleton({ height = 16, width = '100%', style = {} }) {
+  return (
+    <div style={{
+      height, width, borderRadius: 6,
+      background: 'var(--color-bg-tertiary)',
+      animation: 'pulse 1.5s ease-in-out infinite',
+      ...style,
+    }} />
+  );
+}
+
 export default function Dashboard() {
-  const liveQueue = useLiveMetric(312, 8);
+  const { data: kpis,     loading: kpisLoading }   = useFetch('/api/v1/dashboard/kpis');
+  const { data: stages,   loading: stagesLoading } = useFetch('/api/v1/dashboard/pipeline-stages');
+  const { data: alertsData, loading: alertsLoading } = useFetch('/api/v1/dashboard/alerts');
+  const { data: throughput, loading: tpLoading }   = useFetch('/api/v1/dashboard/throughput');
+  const { data: tenantsPage, loading: tenantsLoading } = useFetch('/api/v1/tenants/?page_size=10');
+  const { data: queuePage,   loading: queueLoading }   = useFetch('/api/v1/queue/?page_size=7');
+
+  const tenants = tenantsPage?.items ?? [];
+  const queue   = queuePage?.items ?? [];
 
   return (
     <div className={styles.page}>
-      <Topbar title="Operations overview" subtitle="Today · June 20, 2026" />
+      <Topbar title="Operations overview" subtitle="Today · live data" />
 
       <div className={styles.content}>
         <div className={styles.metrics}>
-          <MetricCard label="Documents today" value="1,284" delta="↑ 12% vs yesterday" deltaType="positive" />
-          <MetricCard label="Avg turnaround" value="4.2 min" delta="↓ 0.8 min faster" deltaType="positive" />
-          <MetricCard label="Extraction success" value="97.3%" delta="↓ 0.4% vs target" deltaType="warning" />
-          <MetricCard label="DLQ backlog" value="18" delta="↑ 6 since 9am" deltaType="negative" />
+          {kpisLoading ? (
+            [1,2,3,4].map(i => <Skeleton key={i} height={80} style={{ borderRadius: 12 }} />)
+          ) : kpis ? (
+            <>
+              <MetricCard label="Documents today"    value={kpis.documentsToday.toLocaleString()} delta={`↑ ${kpis.documentsDelta} vs yesterday`}  deltaType="positive" />
+              <MetricCard label="Avg turnaround"     value={kpis.avgTurnaround}                   delta={`↓ ${kpis.turnaroundDelta} faster`}         deltaType="positive" />
+              <MetricCard label="Extraction success" value={kpis.extractionSuccess}               delta={`${kpis.successDelta}`}                      deltaType="warning" />
+              <MetricCard label="DLQ backlog"        value={kpis.dlqBacklog.toString()}           delta={`↑ ${kpis.dlqDelta}`}                        deltaType="negative" />
+            </>
+          ) : null}
         </div>
 
         <div className={styles.row}>
           <Card title="Processing queue" subtitle="Live · refreshes every 5s">
             <div>
-              {pipelineQueue.slice(0, 7).map(doc => {
-                const s = statusConfig[doc.status];
+              {queueLoading ? (
+                [1,2,3,4,5].map(i => <Skeleton key={i} height={36} style={{ marginBottom: 8 }} />)
+              ) : queue.map(doc => {
+                const s = statusConfig[doc.status] ?? { label: doc.status, bg: '#f1f3f7', color: '#4b5669' };
                 return (
                   <div key={doc.id} className={styles.queueRow}>
                     <div className={styles.queueInfo}>
-                      <span className={styles.queueId}>{doc.id}</span>
+                      <span className={styles.queueId}>{doc.id.slice(0, 8)}</span>
                       <span className={styles.queueName}>{doc.name}</span>
                       <span className={styles.queueType}>{doc.type}</span>
                     </div>
@@ -60,7 +86,9 @@ export default function Dashboard() {
           </Card>
 
           <Card title="Pipeline stages" subtitle="All tenants · last hour">
-            {pipelineStages.map(stage => (
+            {stagesLoading ? (
+              [1,2,3,4,5,6].map(i => <Skeleton key={i} height={32} style={{ marginBottom: 8 }} />)
+            ) : (stages ?? []).map(stage => (
               <div key={stage.name} className={styles.stageRow}>
                 <div className={styles.stageMeta}>
                   <div className={styles.stageDot} style={{ background: stage.color }} />
@@ -77,11 +105,16 @@ export default function Dashboard() {
 
         <div className={styles.row}>
           <Card title="Document throughput" subtitle="Hourly volume today">
-            <ThroughputChart />
+            {tpLoading
+              ? <Skeleton height={180} />
+              : <ThroughputChart data={throughput ?? []} />
+            }
           </Card>
 
           <Card title="Recent alerts" subtitle="Last 4 hours">
-            {alerts.map(alert => (
+            {alertsLoading ? (
+              [1,2,3,4,5].map(i => <Skeleton key={i} height={52} style={{ marginBottom: 8 }} />)
+            ) : (alertsData ?? []).map(alert => (
               <div key={alert.id} className={styles.alertRow}>
                 <AlertIcon type={alert.type} />
                 <div className={styles.alertBody}>
@@ -96,7 +129,9 @@ export default function Dashboard() {
 
         <Card title="Tenants by volume" subtitle="Today · all facilities">
           <div className={styles.tenantGrid}>
-            {tenants.map(t => (
+            {tenantsLoading ? (
+              [1,2,3,4,5].map(i => <Skeleton key={i} height={96} style={{ borderRadius: 10 }} />)
+            ) : tenants.map(t => (
               <div key={t.id} className={styles.tenantCard}>
                 <div className={styles.tenantTop}>
                   <div className={styles.tenantAvatar} style={{ background: t.bg, color: t.color }}>{t.initials}</div>

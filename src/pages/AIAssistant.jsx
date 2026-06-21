@@ -38,12 +38,6 @@ export default function AIAssistant() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const systemPrompt = `You are a healthcare data platform assistant for HealthAI. 
-You help managers, analysts, and data engineers understand pipeline health, patient report processing, SLA status, and extraction quality.
-Keep responses concise and data-focused. Use bullet points for lists.
-Example context: 1,284 documents processed today, 97.3% extraction success, 18 in DLQ, 5 tenants active.
-If asked about specific patients, remind users to use the Patients page for HIPAA-compliant access.`;
-
   async function sendMessage(text) {
     const userMsg = text || input.trim();
     if (!userMsg || loading) return;
@@ -57,19 +51,21 @@ If asked about specific patients, remind users to use the Patients page for HIPA
     setMessages(prev => [...prev, aiMsg]);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/v1/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer demo-token',
+        },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          system: systemPrompt,
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
 
       const data = await response.json();
-      const reply = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
+      const reply = response.ok
+        ? (data.reply || 'Sorry, I could not generate a response.')
+        : `Error: ${data.detail || 'Unknown error'}`;
 
       setMessages(prev => {
         const updated = [...prev];
@@ -79,7 +75,7 @@ If asked about specific patients, remind users to use the Patients page for HIPA
     } catch (err) {
       setMessages(prev => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: 'assistant', content: 'Connection error. Check your API key and network.', loading: false };
+        updated[updated.length - 1] = { role: 'assistant', content: 'Connection error. Is the backend running?', loading: false };
         return updated;
       });
     } finally {

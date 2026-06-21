@@ -1,5 +1,4 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { throughputData } from '../../data/mockData';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -17,10 +16,10 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-export default function ThroughputChart() {
+export default function ThroughputChart({ data = [] }) {
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={throughputData} barSize={20} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+      <BarChart data={data} barSize={20} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 3" />
         <XAxis dataKey="hour" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
