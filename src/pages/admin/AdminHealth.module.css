@@ -1,0 +1,102 @@
+.page { padding: 2rem; max-width: 1100px; }
+
+.header { margin-bottom: 1.5rem; }
+.title { font-size: 20px; font-weight: 600; color: var(--color-text-primary); }
+.subtitle { font-size: 13px; color: var(--color-text-muted); margin-top: 2px; }
+
+.loading, .error, .empty {
+  padding: 2rem;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+.error { color: var(--color-red-500); }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric {
+  background: var(--color-bg-primary);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+}
+
+.metricValue {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.metricLabel {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.card {
+  flex: 1;
+  background: var(--color-bg-primary);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  text-align: left;
+  padding: 9px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 0.5px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.table td {
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.table tbody tr:last-child td { border-bottom: none; }
+
+.statusChip {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+}
+
+.countCell { font-weight: 500; }
+
+.orgName { font-weight: 500; }

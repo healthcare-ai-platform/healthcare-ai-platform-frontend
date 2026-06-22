@@ -1,5 +1,27 @@
 .page { display: flex; flex-direction: column; flex: 1; }
 
+.errorBanner {
+  margin: 0 1.5rem;
+  background: var(--color-red-50);
+  color: var(--color-red-500);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-secondary);
+  display: block;
+}
+
+.loadingRow {
+  padding: 2rem;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
 .content {
   padding: 1.5rem;
   display: flex;

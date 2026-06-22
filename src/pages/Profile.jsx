@@ -1,34 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Topbar from '../components/layout/Topbar';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
-import { auditLogs } from '../data/mockData';
+import { getMe } from '../api/auth';
 import styles from './Profile.module.css';
 
-const user = {
-  name: 'Amar Kumar',
-  initials: 'AK',
-  role: 'Data Engineer',
-  email: 'amar.kumar@healthai.io',
-  department: 'Platform Engineering',
-  location: 'Bengaluru, IN',
-  joined: 'March 2024',
-  tenants: ['City General Hospital', 'Apollo Diagnostics', 'Sunrise Clinic'],
-  bio: 'Manages the HealthAI ingestion pipeline and Redshift data model. Focused on extraction accuracy and SLA compliance across hospital tenants.',
+const ROLE_LABELS = {
+  tenant_admin: 'Tenant Admin',
+  manager:      'Manager',
+  analyst:      'Analyst',
+  doctor:       'Doctor',
+  ops:          'Ops',
+  viewer:       'Viewer',
+  platform_admin: 'Platform Admin',
 };
 
-const preferences = [
-  { key: 'email_alerts', label: 'Email alerts for DLQ spikes', enabled: true },
-  { key: 'sla_warnings', label: 'In-app SLA breach warnings', enabled: true },
-  { key: 'daily_digest', label: 'Daily pipeline digest', enabled: false },
-  { key: 'audit_notify', label: 'Notify on export events', enabled: false },
+const ROLE_COLORS = {
+  tenant_admin:   { bg: '#f0eeff', color: '#534ab7' },
+  platform_admin: { bg: '#f0eeff', color: '#534ab7' },
+  manager:        { bg: '#faeeda', color: '#854f0b' },
+  analyst:        { bg: 'var(--color-blue-50)', color: 'var(--color-blue-500)' },
+  doctor:         { bg: 'var(--color-green-50)', color: 'var(--color-green-500)' },
+  default:        { bg: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)' },
+};
+
+const DEFAULT_PREFS = [
+  { key: 'email_alerts',  label: 'Email alerts for DLQ spikes',    enabled: true  },
+  { key: 'sla_warnings',  label: 'In-app SLA breach warnings',      enabled: true  },
+  { key: 'daily_digest',  label: 'Daily pipeline digest',           enabled: false },
+  { key: 'audit_notify',  label: 'Notify on export events',         enabled: false },
 ];
 
-const sessions = [
-  { device: 'MacBook Pro · Chrome', location: 'Bengaluru, IN', time: 'Active now', current: true },
-  { device: 'iPhone 15 · Safari', location: 'Bengaluru, IN', time: '2 hours ago', current: false },
-  { device: 'Windows · Edge', location: 'Mumbai, IN', time: '3 days ago', current: false },
-];
+function initials(name = '') {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+}
 
 function Toggle({ enabled, onChange }) {
   return (
@@ -43,102 +48,134 @@ function Toggle({ enabled, onChange }) {
   );
 }
 
-export default function Profile() {
-  const [prefs, setPrefs] = useState(preferences);
-  const [editing, setEditing] = useState(false);
-  const [bio, setBio] = useState(user.bio);
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
 
-  const myLogs = auditLogs.filter(l => l.user.includes('admin') || l.user.includes('analyst')).slice(0, 4);
+function formatDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+export default function Profile() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState('');
+  const [prefs, setPrefs]     = useState(DEFAULT_PREFS);
+
+  useEffect(() => {
+    getMe()
+      .then(setProfile)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   function togglePref(key) {
     setPrefs(p => p.map(item => item.key === key ? { ...item, enabled: !item.enabled } : item));
   }
+
+  const roleKey    = profile?.role || '';
+  const roleLabel  = ROLE_LABELS[roleKey] || roleKey;
+  const roleColor  = ROLE_COLORS[roleKey] || ROLE_COLORS.default;
+  const statusColor = profile?.status === 'active'
+    ? { bg: 'var(--color-green-50)', color: 'var(--color-green-500)' }
+    : { bg: 'var(--color-red-50)',   color: 'var(--color-red-500)'   };
 
   return (
     <div className={styles.page}>
       <Topbar title="Profile" subtitle="Account settings and preferences" />
       <div className={styles.content}>
 
+        {error && <div className={styles.errorBanner}>{error}</div>}
+
+        {/* ── Header card ── */}
         <div className={styles.profileHeader}>
-          <div className={styles.avatarLarge}>AK</div>
-          <div className={styles.profileMeta}>
-            <div className={styles.profileName}>{user.name}</div>
-            <div className={styles.profileRole}>{user.role} · {user.department}</div>
-            <div className={styles.profileEmail}>{user.email}</div>
-            <div className={styles.tagRow}>
-              <Badge label="Data Engineer" bg="var(--color-blue-50)" color="var(--color-blue-500)" />
-              <Badge label="Platform Engineering" bg="var(--color-purple-50)" color="var(--color-purple-500)" />
-              <Badge label={`Joined ${user.joined}`} bg="var(--color-bg-tertiary)" color="var(--color-text-secondary)" />
-            </div>
+          <div className={styles.avatarLarge}>
+            {loading ? '…' : initials(profile?.name || profile?.email || '')}
           </div>
-          <button className={styles.editBtn} onClick={() => setEditing(e => !e)}>
-            {editing ? 'Cancel' : 'Edit profile'}
-          </button>
+          <div className={styles.profileMeta}>
+            {loading ? (
+              <div className={styles.skeleton} style={{ width: 160, height: 22, marginBottom: 8 }} />
+            ) : (
+              <>
+                <div className={styles.profileName}>{profile?.name || '—'}</div>
+                <div className={styles.profileEmail}>{profile?.email || '—'}</div>
+                <div className={styles.tagRow}>
+                  <Badge label={roleLabel} bg={roleColor.bg} color={roleColor.color} />
+                  <Badge
+                    label={profile?.status || '—'}
+                    bg={statusColor.bg}
+                    color={statusColor.color}
+                  />
+                  {profile?.created_at && (
+                    <Badge
+                      label={`Joined ${formatDate(profile.created_at)}`}
+                      bg="var(--color-bg-tertiary)"
+                      color="var(--color-text-secondary)"
+                    />
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className={styles.grid}>
           <div className={styles.col}>
-            <Card title="Personal information" subtitle="Your account details">
+            {/* ── Account info ── */}
+            <Card title="Account information" subtitle="Your profile details">
               <div className={styles.fieldList}>
                 <div className={styles.field}>
                   <span className={styles.fieldLabel}>Full name</span>
-                  {editing
-                    ? <input className={styles.fieldInput} defaultValue={user.name} />
-                    : <span className={styles.fieldValue}>{user.name}</span>
-                  }
+                  <span className={styles.fieldValue}>
+                    {loading ? '—' : profile?.name || '—'}
+                  </span>
                 </div>
                 <div className={styles.field}>
                   <span className={styles.fieldLabel}>Email</span>
-                  {editing
-                    ? <input className={styles.fieldInput} defaultValue={user.email} />
-                    : <span className={styles.fieldValue}>{user.email}</span>
-                  }
+                  <span className={styles.fieldValue}>
+                    {loading ? '—' : profile?.email || '—'}
+                  </span>
                 </div>
                 <div className={styles.field}>
                   <span className={styles.fieldLabel}>Role</span>
-                  <span className={styles.fieldValue}>{user.role}</span>
+                  <span className={styles.fieldValue}>{loading ? '—' : roleLabel}</span>
                 </div>
                 <div className={styles.field}>
-                  <span className={styles.fieldLabel}>Department</span>
-                  <span className={styles.fieldValue}>{user.department}</span>
+                  <span className={styles.fieldLabel}>Status</span>
+                  <span className={styles.fieldValue}>
+                    {loading ? '—' : (
+                      <Badge
+                        label={profile?.status || '—'}
+                        bg={statusColor.bg}
+                        color={statusColor.color}
+                      />
+                    )}
+                  </span>
                 </div>
-                <div className={styles.field}>
-                  <span className={styles.fieldLabel}>Location</span>
-                  {editing
-                    ? <input className={styles.fieldInput} defaultValue={user.location} />
-                    : <span className={styles.fieldValue}>{user.location}</span>
-                  }
-                </div>
-                <div className={styles.field} style={{ alignItems: 'flex-start' }}>
-                  <span className={styles.fieldLabel} style={{ paddingTop: 2 }}>Bio</span>
-                  {editing
-                    ? <textarea className={styles.fieldTextarea} value={bio} onChange={e => setBio(e.target.value)} rows={3} />
-                    : <span className={styles.fieldValue}>{bio}</span>
-                  }
-                </div>
-              </div>
-              {editing && (
-                <div className={styles.saveRow}>
-                  <button className={styles.saveBtn} onClick={() => setEditing(false)}>Save changes</button>
-                </div>
-              )}
-            </Card>
-
-            <Card title="Tenant access" subtitle="Facilities you can view">
-              <div className={styles.tenantList}>
-                {user.tenants.map(t => (
-                  <div key={t} className={styles.tenantItem}>
-                    <div className={styles.tenantDot} />
-                    <span className={styles.tenantName}>{t}</span>
-                    <Badge label="Read access" bg="var(--color-teal-50)" color="var(--color-teal-500)" />
+                {profile?.facility_name && (
+                  <div className={styles.field}>
+                    <span className={styles.fieldLabel}>Facility</span>
+                    <span className={styles.fieldValue}>{profile.facility_name}</span>
                   </div>
-                ))}
+                )}
+                <div className={styles.field}>
+                  <span className={styles.fieldLabel}>Member since</span>
+                  <span className={styles.fieldValue}>
+                    {loading ? '—' : formatDate(profile?.created_at)}
+                  </span>
+                </div>
               </div>
             </Card>
           </div>
 
           <div className={styles.col}>
-            <Card title="Notification preferences" subtitle="Choose what you're alerted about">
+            {/* ── Notification prefs ── */}
+            <Card title="Notification preferences" subtitle="Saved locally in this browser">
               <div className={styles.prefList}>
                 {prefs.map(p => (
                   <div key={p.key} className={styles.prefRow}>
@@ -149,65 +186,56 @@ export default function Profile() {
               </div>
             </Card>
 
-            <Card title="Security" subtitle="Password and active sessions">
+            {/* ── Security ── */}
+            <Card title="Security" subtitle="Authentication details">
               <div className={styles.secSection}>
                 <div className={styles.secRow}>
                   <div>
-                    <div className={styles.secLabel}>Password</div>
-                    <div className={styles.secSub}>Last changed 45 days ago</div>
+                    <div className={styles.secLabel}>Authentication</div>
+                    <div className={styles.secSub}>Email and password</div>
                   </div>
-                  <button className={styles.secBtn}>Change password</button>
+                  <Badge label="Active" bg="var(--color-green-50)" color="var(--color-green-500)" />
                 </div>
                 <div className={styles.secRow}>
                   <div>
-                    <div className={styles.secLabel}>Two-factor authentication</div>
-                    <div className={styles.secSub}>TOTP via authenticator app</div>
+                    <div className={styles.secLabel}>Session tokens</div>
+                    <div className={styles.secSub}>JWT · expires in 60 min</div>
                   </div>
-                  <Badge label="Enabled" bg="var(--color-teal-50)" color="var(--color-teal-500)" />
+                  <Badge label="Stateless" bg="var(--color-bg-tertiary)" color="var(--color-text-secondary)" />
                 </div>
-              </div>
-              <div className={styles.sessionDivider}>Active sessions</div>
-              <div className={styles.sessionList}>
-                {sessions.map((s, i) => (
-                  <div key={i} className={styles.sessionRow}>
-                    <div className={styles.sessionDevice}>
-                      <span className={styles.sessionName}>{s.device}</span>
-                      <span className={styles.sessionLoc}>{s.location} · {s.time}</span>
-                    </div>
-                    {s.current
-                      ? <Badge label="Current" bg="var(--color-green-50)" color="var(--color-green-500)" />
-                      : <button className={styles.revokeBtn}>Revoke</button>
-                    }
-                  </div>
-                ))}
               </div>
             </Card>
           </div>
         </div>
 
-        <Card title="Recent activity" subtitle="Your last 4 audit events">
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Action</th>
-                <th>Resource</th>
-                <th>Tenant</th>
-                <th>IP address</th>
-              </tr>
-            </thead>
-            <tbody>
-              {myLogs.map(log => (
-                <tr key={log.id} className={styles.tableRow}>
-                  <td><span className={styles.mono}>{log.time}</span></td>
-                  <td><span className={styles.action}>{log.action}</span></td>
-                  <td className={styles.muted}>{log.resource}</td>
-                  <td className={styles.muted}>{log.tenant}</td>
-                  <td><span className={styles.mono}>{log.ip}</span></td>
+        {/* ── Recent activity ── */}
+        <Card title="Recent activity" subtitle="Your last 6 audit events">
+          {loading ? (
+            <div className={styles.loadingRow}>Loading activity…</div>
+          ) : !profile?.recent_activity?.length ? (
+            <div className={styles.loadingRow}>No activity recorded yet</div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Action</th>
+                  <th>Resource</th>
+                  <th>IP address</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {profile.recent_activity.map(log => (
+                  <tr key={log.id} className={styles.tableRow}>
+                    <td><span className={styles.mono}>{formatDateTime(log.time)}</span></td>
+                    <td><span className={styles.action}>{log.action}</span></td>
+                    <td className={styles.muted}>{log.resource}</td>
+                    <td><span className={styles.mono}>{log.ip || '—'}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </Card>
 
       </div>

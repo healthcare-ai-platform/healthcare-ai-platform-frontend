@@ -1,10 +1,12 @@
-const TOKEN = 'demo-token';
+function getToken() {
+  return localStorage.getItem('hc_access') || '';
+}
 
 export async function apiFetch(path, opts = {}) {
   const res = await fetch(path, {
     ...opts,
     headers: {
-      'Authorization': `Bearer ${TOKEN}`,
+      'Authorization': `Bearer ${getToken()}`,
       'Content-Type': 'application/json',
       ...opts.headers,
     },

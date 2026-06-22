@@ -1,0 +1,186 @@
+.page { padding: 2rem; max-width: 900px; }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title { font-size: 20px; font-weight: 600; color: var(--color-text-primary); }
+.subtitle { font-size: 13px; color: var(--color-text-muted); margin-top: 2px; }
+
+.successBanner {
+  background: var(--color-green-50);
+  color: var(--color-green-500);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 1rem;
+}
+
+.errorBanner {
+  background: var(--color-red-50);
+  color: var(--color-red-500);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 1rem;
+}
+
+.card {
+  background: var(--color-bg-primary);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.loading, .empty {
+  padding: 3rem;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.userList { display: flex; flex-direction: column; }
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--color-border);
+  transition: background var(--transition);
+}
+
+.userRow:last-child { border-bottom: none; }
+.userRow:hover { background: var(--color-bg-secondary); }
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-blue-50);
+  color: var(--color-blue-500);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userInfo { flex: 1; }
+.userName { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.userEmail { font-size: 12px; color: var(--color-text-muted); margin-top: 1px; }
+
+.badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-green-50);
+  color: var(--color-green-500);
+}
+
+.badge[data-status="invited"] {
+  background: var(--color-amber-50);
+  color: var(--color-amber-500);
+}
+
+.joinDate { font-size: 12px; color: var(--color-text-muted); min-width: 90px; text-align: right; }
+
+/* buttons */
+.btnPrimary {
+  padding: 7px 14px;
+  background: var(--color-blue-500);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.btnPrimary:hover:not(:disabled) { background: var(--color-blue-600); }
+.btnPrimary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btnSecondary {
+  padding: 7px 14px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  cursor: pointer;
+}
+.btnSecondary:hover { background: var(--color-bg-secondary); }
+
+/* modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 22, 35, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--color-bg-primary);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 400px;
+  padding: 1.5rem;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.modalTitle { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+.modalClose { background: none; border: none; font-size: 14px; color: var(--color-text-muted); cursor: pointer; }
+
+.modalForm { display: flex; flex-direction: column; gap: 0.875rem; }
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 7px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  outline: none;
+  transition: border-color var(--transition);
+}
+.input:focus { border-color: var(--color-blue-500); }
+
+.formError {
+  font-size: 12px;
+  color: var(--color-red-500);
+  background: var(--color-red-50);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
