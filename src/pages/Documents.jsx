@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Topbar from '../components/layout/Topbar';
 import { uploadPdf, listDocuments } from '../api/documents';
+import { getStoredUser } from '../hooks/useAuth';
 import styles from './Documents.module.css';
 
-const REPORT_TYPES = [
+const ALL_REPORT_TYPES = [
   { value: 'lab_report',        label: 'Lab Report' },
   { value: 'radiology',         label: 'Radiology' },
   { value: 'discharge_summary', label: 'Discharge Summary' },
@@ -11,6 +12,19 @@ const REPORT_TYPES = [
   { value: 'clinical_note',     label: 'Clinical Note' },
   { value: 'pathology',         label: 'Pathology' },
 ];
+
+const UPLOAD_BLOCKED_ROLES = new Set(['analyst', 'viewer']);
+
+const ROLE_ALLOWED_TYPES = {
+  doctor: new Set(['clinical_note', 'prescription', 'discharge_summary', 'radiology']),
+};
+
+function getAllowedTypes(role) {
+  if (UPLOAD_BLOCKED_ROLES.has(role)) return [];
+  const allowed = ROLE_ALLOWED_TYPES[role];
+  if (!allowed) return ALL_REPORT_TYPES;
+  return ALL_REPORT_TYPES.filter(t => allowed.has(t.value));
+}
 
 const STATUS_FILTERS = ['all', 'received', 'ocr', 'extracting', 'loaded', 'failed'];
 
@@ -43,10 +57,15 @@ function CheckIcon() {
 }
 
 export default function Documents() {
+  const user        = getStoredUser();
+  const role        = user?.role || '';
+  const canUpload   = !UPLOAD_BLOCKED_ROLES.has(role);
+  const reportTypes = getAllowedTypes(role);
+
   const inputRef    = useRef(null);
   const [dragging, setDragging]     = useState(false);
   const [file, setFile]             = useState(null);
-  const [reportType, setReportType] = useState('lab_report');
+  const [reportType, setReportType] = useState(reportTypes[0]?.value || '');
   const [uploading, setUploading]   = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
   const [uploadError, setUploadError]   = useState('');
@@ -135,7 +154,12 @@ export default function Documents() {
           </div>
 
           <div className={styles.uploadBody}>
-            {uploadResult ? (
+            {!canUpload ? (
+              <div className={styles.uploadError}>
+                Your role ({role}) is not permitted to upload documents.
+                Contact your tenant admin if you need access.
+              </div>
+            ) : uploadResult ? (
               <div className={styles.successState}>
                 <div className={styles.successIcon}><CheckIcon /></div>
                 <div>
@@ -199,7 +223,7 @@ export default function Documents() {
                       value={reportType}
                       onChange={e => setReportType(e.target.value)}
                     >
-                      {REPORT_TYPES.map(r => (
+                      {reportTypes.map(r => (
                         <option key={r.value} value={r.value}>{r.label}</option>
                       ))}
                     </select>
