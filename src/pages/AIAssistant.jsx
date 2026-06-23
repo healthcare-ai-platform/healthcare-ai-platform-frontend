@@ -55,7 +55,7 @@ export default function AIAssistant() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer demo-token',
+          'Authorization': `Bearer ${localStorage.getItem('hc_access') || ''}`,
         },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
