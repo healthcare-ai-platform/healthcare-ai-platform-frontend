@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { listTenants, createTenant, suspendTenant } from '../../api/admin';
 import styles from './AdminTenants.module.css';
 
-const PLANS = ['starter', 'growth', 'enterprise'];
+const PLANS = ['starter', 'professional', 'enterprise'];
 
 function StatusBadge({ status }) {
   const map = {

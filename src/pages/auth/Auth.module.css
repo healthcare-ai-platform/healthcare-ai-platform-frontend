@@ -124,3 +124,43 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.link {
+  font-size: 13px;
+  color: var(--color-blue-500);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
+.linkRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+}
+
+.successBox {
+  font-size: 13px;
+  color: var(--color-green-500);
+  background: var(--color-green-50);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.backLink:hover {
+  color: var(--color-blue-500);
+}

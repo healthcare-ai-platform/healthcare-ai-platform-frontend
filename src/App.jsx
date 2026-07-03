@@ -6,6 +6,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import Login from './pages/auth/Login';
 import AcceptInvite from './pages/auth/AcceptInvite';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
@@ -15,6 +17,7 @@ import AIAssistant from './pages/AIAssistant';
 import Placeholder from './pages/Placeholder';
 import Profile from './pages/Profile';
 import Documents from './pages/Documents';
+import Facilities from './pages/Facilities';
 import TenantTeam from './pages/tenant/TenantTeam';
 
 import AdminTenants from './pages/admin/AdminTenants';
@@ -32,8 +35,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/login"         element={<Login />} />
-        <Route path="/accept-invite" element={<AcceptInvite />} />
+        <Route path="/login"           element={<Login />} />
+        <Route path="/accept-invite"   element={<AcceptInvite />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
 
         {/* Platform admin panel */}
         <Route path="/admin" element={
@@ -100,7 +105,7 @@ export default function App() {
         } />
         <Route path="/facilities" element={
           <ProtectedRoute>
-            <AppLayout><Placeholder title="Facilities" subtitle="Hospital and clinic breakdown" description="Facility-level analytics with SLA tracking and volume trends. Coming in Phase 3." /></AppLayout>
+            <AppLayout><Facilities /></AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/ai-assistant" element={

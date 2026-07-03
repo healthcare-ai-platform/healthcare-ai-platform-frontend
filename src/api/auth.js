@@ -35,3 +35,29 @@ export async function acceptInvite(token, newPassword) {
   }
   return res.json();
 }
+
+export async function forgotPassword(email) {
+  const res = await fetch('/api/v1/auth/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to request password reset');
+  }
+  return res.json();
+}
+
+export async function resetPassword(token, newPassword) {
+  const res = await fetch('/api/v1/auth/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, new_password: newPassword }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to reset password');
+  }
+  return res.json();
+}
