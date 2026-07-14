@@ -23,3 +23,11 @@ export const patientStatusConfig = {
   abnormal: { label: 'Abnormal', bg: '#fcebeb', color: '#a32d2d' },
   review:   { label: 'Review',   bg: '#faeeda', color: '#854f0b' },
 };
+
+export const flagConfig = {
+  critical:   { label: 'Critical',   bg: '#fcebeb', color: '#a32d2d' },
+  high:       { label: 'High',       bg: '#faeeda', color: '#854f0b' },
+  low:        { label: 'Low',        bg: '#faeeda', color: '#854f0b' },
+  borderline: { label: 'Borderline', bg: '#faeeda', color: '#854f0b' },
+  normal:     { label: 'Normal',     bg: '#eaf3de', color: '#3b6d11' },
+};

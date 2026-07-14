@@ -3,7 +3,7 @@ import MetricCard from '../components/ui/MetricCard';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import ThroughputChart from '../components/charts/ThroughputChart';
-import { statusConfig } from '../utils/helpers';
+import { statusConfig, flagConfig } from '../utils/helpers';
 import { useFetch } from '../hooks/useApi';
 import styles from './Dashboard.module.css';
 
@@ -42,6 +42,7 @@ export default function Dashboard() {
   const { data: throughput, loading: tpLoading }   = useFetch('/api/v1/dashboard/throughput');
   const { data: tenantsPage, loading: tenantsLoading } = useFetch('/api/v1/tenants/?page_size=10');
   const { data: queuePage,   loading: queueLoading }   = useFetch('/api/v1/queue/?page_size=7');
+  const { data: labAnalytics, loading: labLoading }    = useFetch('/api/v1/dashboard/lab-analytics');
 
   const tenants = tenantsPage?.items ?? [];
   const queue   = queuePage?.items ?? [];
@@ -153,6 +154,27 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+        </Card>
+
+        <Card title="Lab result analytics" subtitle="Warehouse · Snowflake dbt marts, all facilities">
+          {labLoading ? (
+            [1,2,3].map(i => <Skeleton key={i} height={36} style={{ marginBottom: 8 }} />)
+          ) : (labAnalytics ?? []).length === 0 ? (
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>No lab results yet.</div>
+          ) : (labAnalytics ?? []).map(row => {
+            const f = flagConfig[row.flag] ?? { label: row.flag, bg: '#f1f3f7', color: '#4b5669' };
+            return (
+              <div key={`${row.testName}-${row.flag}`} className={styles.queueRow}>
+                <div className={styles.queueInfo}>
+                  <span className={styles.queueName}>{row.testName}</span>
+                  <span className={styles.queueType}>
+                    {row.resultCount} result{row.resultCount !== 1 ? 's' : ''} · {(row.avgConfidence * 100).toFixed(0)}% avg confidence
+                  </span>
+                </div>
+                <Badge label={f.label} bg={f.bg} color={f.color} />
+              </div>
+            );
+          })}
         </Card>
       </div>
     </div>
