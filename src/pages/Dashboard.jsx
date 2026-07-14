@@ -5,6 +5,7 @@ import Badge from '../components/ui/Badge';
 import ThroughputChart from '../components/charts/ThroughputChart';
 import { statusConfig, flagConfig } from '../utils/helpers';
 import { useFetch } from '../hooks/useApi';
+import { getStoredUser } from '../hooks/useAuth';
 import styles from './Dashboard.module.css';
 
 function AlertIcon({ type }) {
@@ -40,7 +41,10 @@ export default function Dashboard() {
   const { data: stages,   loading: stagesLoading } = useFetch('/api/v1/dashboard/pipeline-stages');
   const { data: alertsData, loading: alertsLoading } = useFetch('/api/v1/dashboard/alerts');
   const { data: throughput, loading: tpLoading }   = useFetch('/api/v1/dashboard/throughput');
-  const { data: tenantsPage, loading: tenantsLoading } = useFetch('/api/v1/tenants/?page_size=10');
+  const isPlatformAdmin = getStoredUser()?.role === 'platform_admin';
+
+  // Cross-tenant summary — platform_admin only, backend enforces this too.
+  const { data: tenantsPage, loading: tenantsLoading } = useFetch(isPlatformAdmin ? '/api/v1/tenants/?page_size=10' : null);
   const { data: queuePage,   loading: queueLoading }   = useFetch('/api/v1/queue/?page_size=7');
   const { data: labAnalytics, loading: labLoading }    = useFetch('/api/v1/dashboard/lab-analytics');
 
@@ -128,33 +132,35 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <Card title="Tenants by volume" subtitle="Today · all facilities">
-          <div className={styles.tenantGrid}>
-            {tenantsLoading ? (
-              [1,2,3,4,5].map(i => <Skeleton key={i} height={96} style={{ borderRadius: 10 }} />)
-            ) : tenants.map(t => (
-              <div key={t.id} className={styles.tenantCard}>
-                <div className={styles.tenantTop}>
-                  <div className={styles.tenantAvatar} style={{ background: t.bg, color: t.color }}>{t.initials}</div>
-                  <div>
-                    <div className={styles.tenantName}>{t.name}</div>
-                    <div className={styles.tenantDocs}>{t.docs} docs today</div>
+        {isPlatformAdmin && (
+          <Card title="Tenants by volume" subtitle="Today · all facilities">
+            <div className={styles.tenantGrid}>
+              {tenantsLoading ? (
+                [1,2,3,4,5].map(i => <Skeleton key={i} height={96} style={{ borderRadius: 10 }} />)
+              ) : tenants.map(t => (
+                <div key={t.id} className={styles.tenantCard}>
+                  <div className={styles.tenantTop}>
+                    <div className={styles.tenantAvatar} style={{ background: t.bg, color: t.color }}>{t.initials}</div>
+                    <div>
+                      <div className={styles.tenantName}>{t.name}</div>
+                      <div className={styles.tenantDocs}>{t.docs} docs today</div>
+                    </div>
+                    <Badge
+                      label={t.sla === 'ok' ? 'SLA ok' : 'At risk'}
+                      bg={t.sla === 'ok' ? '#eaf3de' : '#faeeda'}
+                      color={t.sla === 'ok' ? '#3b6d11' : '#854f0b'}
+                      style={{ marginLeft: 'auto' }}
+                    />
                   </div>
-                  <Badge
-                    label={t.sla === 'ok' ? 'SLA ok' : 'At risk'}
-                    bg={t.sla === 'ok' ? '#eaf3de' : '#faeeda'}
-                    color={t.sla === 'ok' ? '#3b6d11' : '#854f0b'}
-                    style={{ marginLeft: 'auto' }}
-                  />
+                  <div className={styles.tenantStats}>
+                    <div><span className={styles.statLabel}>Avg time</span><span className={styles.statVal}>{t.avgTime}</span></div>
+                    <div><span className={styles.statLabel}>Failures</span><span className={styles.statVal} style={{ color: t.failures > 0 ? '#a32d2d' : undefined }}>{t.failures}</span></div>
+                  </div>
                 </div>
-                <div className={styles.tenantStats}>
-                  <div><span className={styles.statLabel}>Avg time</span><span className={styles.statVal}>{t.avgTime}</span></div>
-                  <div><span className={styles.statLabel}>Failures</span><span className={styles.statVal} style={{ color: t.failures > 0 ? '#a32d2d' : undefined }}>{t.failures}</span></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        )}
 
         <Card title="Lab result analytics" subtitle="Warehouse · Snowflake dbt marts, all facilities">
           {labLoading ? (
